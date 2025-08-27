@@ -172,13 +172,29 @@
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
             border-left: 5px solid var(--pastel-purple-dark);
         }
+        
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
 
         .day-card h2 {
-            margin-top: 0;
-            margin-bottom: 1rem;
+            margin: 0;
             color: var(--accent-color);
             font-size: 1.4rem;
             font-weight: 600;
+        }
+        
+        .speaker-icon {
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+        
+        .speaker-icon:hover {
+            opacity: 1;
         }
 
         .day-card p {
@@ -276,7 +292,7 @@
             </main>
 
             <footer class="app-footer">
-                © 2025 <a href="https://krunidblogger.blogspot.com/" target="_blank">กฤตัชญ์ วัฒนชาต ทัศนศร</a> | สำนักตักศิลา
+                © 2025 <a href="https://krunidblogger.blogspot.com/" target="_blank">กฤตัชญ์ วัฒนชาต ทัศนศร</a> |  สำนักตักศิลา
             </footer>
         </div>
     </div>
@@ -429,14 +445,39 @@
                 weekData.forEach(dayData => {
                     const card = document.createElement('div');
                     card.className = 'day-card';
+
+                    const dayHeader = document.createElement('div');
+                    dayHeader.className = 'day-header';
                     
                     const title = document.createElement('h2');
                     title.textContent = dayData.day;
                     
+                    const speakerIcon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+                    speakerIcon.setAttribute('class', 'speaker-icon');
+                    speakerIcon.setAttribute('viewBox', '0 0 24 24');
+                    speakerIcon.setAttribute('width', '24');
+                    speakerIcon.setAttribute('height', '24');
+                    speakerIcon.innerHTML = `<path fill="${getComputedStyle(document.documentElement).getPropertyValue('--accent-color').trim()}" d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"></path>`;
+                    
+                    speakerIcon.addEventListener('click', () => {
+                        if ('speechSynthesis' in window) {
+                            speechSynthesis.cancel(); // Stop any previous speech
+                            const utterance = new SpeechSynthesisUtterance(dayData.script);
+                            utterance.lang = 'th-TH'; // Set language to Thai
+                            utterance.rate = 0.9;
+                            window.speechSynthesis.speak(utterance);
+                        } else {
+                            alert("ขออภัย เบราว์เซอร์ของคุณไม่รองรับการอ่านออกเสียง");
+                        }
+                    });
+
+                    dayHeader.appendChild(title);
+                    dayHeader.appendChild(speakerIcon);
+                    
                     const paragraph = document.createElement('p');
                     paragraph.textContent = dayData.script;
                     
-                    card.appendChild(title);
+                    card.appendChild(dayHeader);
                     card.appendChild(paragraph);
                     weekContainer.appendChild(card);
                 });
