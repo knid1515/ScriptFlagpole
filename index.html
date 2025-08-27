@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>สคริปต์หน้าเสาธง</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --pastel-purple-light: #e1d5f5;
+            --pastel-purple-dark: #bba2e0;
+            --text-color: #333;
+            --bg-color: #f9f7fd;
+            --card-bg: #ffffff;
+            --accent-color: #8e44ad;
+            --icon-color: #ffffff; /* Changed icon color to white */
+        }
+
+        body {
+            margin: 0;
+            padding: 2rem;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            font-family: 'Kanit', sans-serif;
+            color: var(--text-color);
+        }
+
+        /* iPad Frame */
+        .ipad-frame {
+            width: 100%;
+            max-width: 820px; /* iPad Air width */
+            aspect-ratio: 820 / 1180; /* iPad Air aspect ratio */
+            background: linear-gradient(145deg, var(--pastel-purple-light), var(--pastel-purple-dark));
+            border-radius: 40px;
+            padding: 25px; /* Thick border */
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15), 0 0 0 10px #111;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ipad-screen {
+            background-color: #f0f2f5;
+            border-radius: 20px;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        
+        /* Accessories */
+        .status-bar {
+            position: absolute;
+            top: 15px;
+            left: 25px;
+            right: 25px;
+            height: 30px;
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .time {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--icon-color);
+        }
+
+        .status-icons {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-icons svg {
+           height: 18px;
+        }
+        
+        .camera-notch {
+            position: absolute;
+            top: 0px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 180px;
+            height: 35px;
+            background: #111;
+            border-radius: 0 0 20px 20px;
+        }
+
+        /* Header */
+        .app-header {
+            text-align: center;
+            padding: 1.5rem;
+            padding-top: 3.5rem; /* Increased padding to push content down */
+            background-color: var(--accent-color);
+            color: white;
+            border-bottom: 2px solid rgba(0,0,0,0.1);
+        }
+
+        .app-header h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        /* Navigation */
+        .week-nav {
+            display: flex;
+            justify-content: space-around;
+            padding: 1rem;
+            background-color: var(--card-bg);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .week-btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background-color: #e9ecef;
+            color: #495057;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Kanit', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .week-btn:hover {
+            background-color: #ced4da;
+        }
+
+        .week-btn.active {
+            background-color: var(--accent-color);
+            color: white;
+            box-shadow: 0 4px 8px rgba(142, 68, 173, 0.3);
+            transform: translateY(-2px);
+        }
+
+        /* Content Area */
+        .content-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1.5rem;
+        }
+
+        .week-content {
+            display: none;
+        }
+
+        .week-content.active {
+            display: block;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .day-card {
+            background-color: var(--card-bg);
+            border-radius: 15px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+            border-left: 5px solid var(--pastel-purple-dark);
+        }
+
+        .day-card h2 {
+            margin-top: 0;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+
+        .day-card p {
+            margin: 0;
+            line-height: 1.8;
+            font-size: 1.1rem;
+            white-space: pre-wrap; /* Preserves newlines from the script */
+        }
+        
+        /* Scrollbar styling */
+        .content-area::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .content-area::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb {
+            background: #ccc;
+            border-radius: 10px;
+        }
+
+        .content-area::-webkit-scrollbar-thumb:hover {
+            background: #aaa;
+        }
+
+        /* Footer */
+        .app-footer {
+            text-align: center;
+            padding: 0.75rem;
+            background-color: var(--card-bg);
+            border-top: 1px solid #e9ecef;
+            font-size: 0.85rem;
+            color: #6c757d;
+        }
+
+        .app-footer a {
+            color: var(--accent-color);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .app-footer a:hover {
+            text-decoration: underline;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="ipad-frame">
+        <div class="ipad-screen">
+            <!-- iPad Accessories -->
+            <div class="camera-notch"></div>
+            <div class="status-bar">
+                <div id="time-display" class="time"></div>
+                <div class="status-icons">
+                    <!-- Cellular Signal Icon -->
+                    <svg width="25" viewBox="0 0 25 23" fill="var(--icon-color)" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="0.5" y="14.5" width="4" height="8" rx="2"/>
+                        <rect x="6.5" y="10.5" width="4" height="12" rx="2"/>
+                        <rect x="12.5" y="6.5" width="4" height="16" rx="2"/>
+                        <rect x="18.5" y="0.5" width="4" height="22" rx="2"/>
+                    </svg>
+                    <!-- Wifi Icon -->
+                    <svg width="26" viewBox="0 0 26 19" stroke="var(--icon-color)" stroke-width="3.5" fill="none" stroke-linecap="round" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M2 10.8594C6.47056 6.38881 14.5294 6.38881 19.5 10.8594"/>
+                        <path d="M6 14.3594C8.76142 11.5979 12.7386 11.5979 15.5 14.3594"/>
+                        <path d="M10.5 17.8594L11 17.3594"/>
+                    </svg>
+                    <!-- Battery Icon -->
+                    <svg width="30" viewBox="0 0 30 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="1" y="1" width="24" height="12" rx="4" stroke="var(--icon-color)" stroke-width="2"/>
+                        <path d="M27 4.5C27.8284 4.5 28.5 5.17157 28.5 6V8C28.5 8.82843 27.8284 9.5 27 9.5H26V4.5H27Z" fill="var(--icon-color)"/>
+                        <rect x="4" y="4" width="18" height="6" rx="2" fill="#25D366"/>
+                    </svg>
+                </div>
+            </div>
+
+            <header class="app-header">
+                <h1>สคริปต์หน้าเสาธง</h1>
+            </header>
+
+            <nav class="week-nav">
+                <button class="week-btn active" data-week="1">สัปดาห์ที่ 1</button>
+                <button class="week-btn" data-week="2">สัปดาห์ที่ 2</button>
+                <button class="week-btn" data-week="3">สัปดาห์ที่ 3</button>
+                <button class="week-btn" data-week="4">สัปดาห์ที่ 4</button>
+            </nav>
+
+            <main class="content-area" id="content-area">
+                <!-- Content will be injected by JavaScript -->
+            </main>
+
+            <footer class="app-footer">
+                © 2025 <a href="https://krunidblogger.blogspot.com/" target="_blank">กฤตัชญ์ วัฒนชาต ทัศนศร</a> | สำนักตักศิลา
+            </footer>
+        </div>
+    </div>
+
+    <script>
+        const scriptData = {
+            week1: [
+                {
+                    day: "จันทร์ (วินัย)",
+                    script: `สวัสดีตอนเช้าครับนักเรียนทุกคน
+วันนี้ครูอยากฝากเรื่อง วินัย วินัยเริ่มจากสิ่งเล็ก ๆ เช่น การตื่นนอนตรงเวลา การแต่งกายให้ถูกระเบียบ และการเข้าเรียนตามตาราง เมื่อเรามีวินัย เราจะได้รับความไว้วางใจ และทำสิ่งต่าง ๆ ได้สำเร็จเสมอ
+ครูขอให้ทุกคนเริ่มสัปดาห์ด้วยการทำสิ่งง่าย ๆ ให้ดีที่สุดครับ`
+                },
+                {
+                    day: "อังคาร (คุณธรรม)",
+                    script: `สวัสดีครับลูก ๆ
+วันนี้ครูอยากพูดถึง คุณธรรมเรื่องความซื่อสัตย์ การซื่อสัตย์ต่อการบ้าน ต่อการสอบ หรือแม้แต่การพูดความจริง จะทำให้เราเป็นคนที่เพื่อนและครูเคารพ เชื่อใจ และอยากอยู่ใกล้
+ครูขอให้นักเรียนทุกคนรักษาความจริงใจและความซื่อสัตย์ไว้ตลอดครับ`
+                },
+                {
+                    day: "พุธ (สุขภาพ)",
+                    script: `สวัสดีครับนักเรียนทุกคน
+กลางสัปดาห์นี้ ครูอยากฝากเรื่อง สุขภาพกายและใจ สุขภาพกายดีจากการกินอาหารที่มีประโยชน์ ส่วนสุขภาพใจดีจากการคิดบวกและการพักผ่อนที่เพียงพอ ถ้าใจสดใส เราก็พร้อมเรียนและเล่นอย่างมีความสุข
+ครูอยากให้ทุกคนยิ้ม และดูแลตัวเองในวันนี้ครับ`
+                },
+                {
+                    day: "พฤหัสบดี (ความปลอดภัย)",
+                    script: `สวัสดีครับทุกคน
+วันนี้ครูอยากฝากเรื่อง ความปลอดภัยในการใช้ถนน ไม่ว่าจะเป็นการเดินข้ามถนน การขี่จักรยาน หรือซ้อนมอเตอร์ไซค์ อย่าลืมใช้ทางม้าลาย สวมหมวกกันน็อก และระมัดระวังรอบตัว
+ความปลอดภัยเล็ก ๆ น้อย ๆ ที่เราดูแล จะช่วยป้องกันอุบัติเหตุและรักษาชีวิตเราได้ครับ`
+                },
+                {
+                    day: "ศุกร์ (แรงบันดาลใจ)",
+                    script: `สวัสดีเช้าวันศุกร์ครับ
+ก่อนจะจบสัปดาห์ ครูอยากฝาก แรงบันดาลใจ ให้กับทุกคน ความพยายามแม้เพียงเล็กน้อยที่ทำต่อเนื่อง จะพาเราไปถึงความสำเร็จ เหมือนนักวิ่งที่วิ่งทีละก้าว จนถึงเส้นชัย
+วันนี้ครูเชื่อว่าทุกคนสามารถทำความฝันของตัวเองให้สำเร็จได้แน่นอนครับ`
+                }
+            ],
+            week2: [
+                {
+                    day: "จันทร์ (วินัย)",
+                    script: `สวัสดีครับนักเรียนทุกคน
+วันนี้เรามาพูดถึงวินัยใกล้ตัวอย่าง “การทำงานบ้านและการช่วยครอบครัว” กันครับ การช่วยพ่อแม่ทำงานเล็กๆ น้อยๆ เช่น กวาดบ้าน ล้างจาน หรือจัดของให้เป็นระเบียบ ไม่ใช่แค่ทำให้บ้านสะอาด แต่มันคือการฝึกความรับผิดชอบและแบ่งเบาภาระของท่าน
+วันนี้ลองกลับบ้านไปถามคุณพ่อคุณแม่นะครับ ว่ามีอะไรให้เราช่วยได้บ้าง แล้วเราจะภูมิใจในตัวเองมากขึ้นครับ`
+                },
+                {
+                    day: "อังคาร (คุณธรรม)",
+                    script: `สวัสดีครับลูกๆ
+วันนี้ครูอยากพูดถึง “การกตัญญู” ครับ ความกตัญญูคือการรู้คุณและตอบแทนผู้มีพระคุณ ไม่ว่าจะเป็นคุณพ่อคุณแม่ที่เลี้ยงดูเรา หรือคุณครูที่สอนหนังสือ การแสดงความกตัญญูทำได้ง่ายๆ ครับ แค่เราเป็นเด็กดี ตั้งใจเรียน และพูดจาไพเราะกับท่าน
+ครูขอให้ทุกคนเป็นเด็กดีของคุณพ่อคุณแม่และคุณครูนะครับ`
+                },
+                {
+                    day: "พุธ (สุขภาพ)",
+                    script: `สวัสดีครับนักเรียน
+กลางสัปดาห์แล้ว เรามาดูแลสุขภาพกันหน่อยนะครับด้วยการ “ดื่มน้ำสะอาด และออกกำลังกายวันละนิด” ร่างกายของเราต้องการน้ำเพื่อความสดชื่น และการขยับตัวเล็กน้อย เช่น เดินเล่น หรือวิ่งในสนาม ก็ช่วยให้ร่างกายแข็งแรง
+วันนี้หลังเลิกเรียน ลองชวนเพื่อนๆ ไปออกกำลังกายกันนะครับ จะได้แข็งแรงและสนุกไปด้วยกัน`
+                },
+                {
+                    day: "พฤหัสบดี (ความปลอดภัย)",
+                    script: `สวัสดีครับทุกคน
+วันนี้เรามาคุยเรื่อง “การใช้อินเทอร์เน็ตและโซเชียลอย่างสร้างสรรค์” กันครับ อินเทอร์เน็ตมีประโยชน์มากมาย แต่ก็มีอันตรายเช่นกัน เราต้องใช้อย่างระมัดระวัง ไม่บอกข้อมูลส่วนตัวกับคนแปลกหน้า และไม่เชื่อทุกอย่างที่เห็น
+ขอให้ทุกคนใช้อินเทอร์เน็ตเพื่อค้นคว้าหาความรู้และทำสิ่งดีๆ นะครับ`
+                },
+                {
+                    day: "ศุกร์ (แรงบันดาลใจ)",
+                    script: `สวัสดีเช้าวันศุกร์ครับ
+ครูมีกำลังใจมาฝากทุกคนในหัวข้อ “ล้มแล้วลุกได้ ไม่ท้อแท้” ครับ ทุกคนเคยทำผิดพลาดหรือล้มเหลวกันทั้งนั้น เหมือนตอนเราหัดขี่จักรยานที่ต้องมีล้มบ้าง แต่สิ่งสำคัญคือการลุกขึ้นมาลองใหม่อีกครั้ง
+ครูเชื่อว่าทุกคนแข็งแกร่งและสามารถผ่านทุกปัญหาไปได้อย่างแน่นอนครับ`
+                }
+            ],
+            week3: [
+                {
+                    day: "จันทร์ (วินัย)",
+                    script: `สวัสดีเริ่มต้นสัปดาห์ใหม่ครับ
+วินัยที่สำคัญที่สุดของนักเรียนคือ “การตั้งใจเรียนและส่งงานตรงเวลา” ครับ การตั้งใจเรียนในห้องทำให้เราเข้าใจบทเรียน และการส่งงานตรงเวลาแสดงถึงความรับผิดชอบของเรา
+ครูขอให้ทุกคนตั้งใจเรียนในทุกคาบ และทำงานที่ได้รับมอบหมายให้เสร็จตามกำหนดนะครับ`
+                },
+                {
+                    day: "อังคาร (คุณธรรม)",
+                    script: `สวัสดีครับนักเรียน
+วันนี้เรามาสร้างสังคมที่น่าอยู่ด้วย “การมีน้ำใจ ช่วยเหลือเพื่อน” กันครับ เมื่อเห็นเพื่อนมีปัญหา เช่น ทำของตก หรือไม่เข้าใจการบ้าน การเข้าไปช่วยเหลือเล็กๆ น้อยๆ จะทำให้เพื่อนรู้สึกดีและทำให้มิตรภาพของเราแข็งแรงขึ้น
+วันนี้ลองมองหาโอกาสช่วยเหลือเพื่อนๆ รอบตัวดูนะครับ`
+                },
+                {
+                    day: "พุธ (สุขภาพ)",
+                    script: `สวัสดีครับทุกคน
+เรื่องสุขภาพวันนี้คือ “นอนหลับให้พอ ตื่นเช้า สดชื่น” การนอนหลับให้เพียงพอเป็นสิ่งสำคัญมากนะครับ มันช่วยให้ร่างกายและสมองได้พักผ่อนเต็มที่ เมื่อเราตื่นเช้ามาก็จะรู้สึกสดใส มีพลังพร้อมที่จะเรียนรู้สิ่งใหม่ๆ
+ใครที่ยังนอนดึก ลองปรับเวลานอนให้เร็วขึ้นดูนะครับ แล้วจะเห็นความแตกต่าง`
+                },
+                {
+                    day: "พฤหัสบดี (ความปลอดภัย)",
+                    script: `สวัสดีครับนักเรียน
+เวลาเล่นสนุกก็ต้องนึกถึงความปลอดภัยด้วยนะครับ วันนี้ครูอยากย้ำเรื่อง “การเล่นในโรงเรียนอย่างระมัดระวัง” ไม่เล่นอะไรที่เสี่ยงอันตราย ไม่ปีนป่ายในที่สูง และไม่เล่นรุนแรงกับเพื่อน
+ขอให้ทุกคนเล่นกับเพื่อนอย่างสนุกและกลับบ้านอย่างปลอดภัยทุกคนนะครับ`
+                },
+                {
+                    day: "ศุกร์ (แรงบันดาลใจ)",
+                    script: `สวัสดีเช้าวันศุกร์ครับ
+ครูอยากให้กำลังใจทุกคนว่า “คนเก่งไม่ยอมแพ้ต่ออุปสรรค” ไม่ว่าเราจะเจอเรื่องยากแค่ไหน เช่น การบ้านที่ทำไม่ได้ หรือวิชาที่ไม่ถนัด ขอเพียงเราไม่ยอมแพ้และพยายามต่อไป เราจะผ่านมันไปได้แน่นอน
+เหมือนนักกีฬาที่ต้องฝึกซ้อมอย่างหนักเพื่อชัยชนะ ขอให้ทุกคนสู้ๆ นะครับ`
+                }
+            ],
+            week4: [
+                {
+                    day: "จันทร์ (วินัย)",
+                    script: `สวัสดีครับนักเรียน
+สัปดาห์นี้เรามาเริ่มวินัยง่ายๆ ด้วย “การเก็บของใช้ส่วนตัวและรักษาความสะอาดโรงเรียน” กันครับ การเก็บของในกระเป๋าให้เป็นระเบียบ การทิ้งขยะให้ลงถัง ช่วยกันดูแลห้องเรียนและโรงเรียนให้สะอาด
+เมื่อรอบตัวเราสะอาดและเป็นระเบียบ เราก็จะรู้สึกดีและอยากมาโรงเรียนทุกวันครับ`
+                },
+                {
+                    day: "อังคาร (คุณธรรม)",
+                    script: `สวัสดีครับทุกคน
+วันนี้ครูอยากฝากเรื่อง “การพูดจาสุภาพ เคารพผู้อื่น” ครับ คำพูดดีๆ มี 'ครับ/ค่ะ' ทำให้คนฟังรู้สึกดี และแสดงว่าเราให้เกียรติเขา ไม่ว่าเราจะคุยกับเพื่อน พี่ หรือน้อง การพูดจาดีๆ จะทำให้เราเป็นที่รักของทุกคน
+วันนี้ลองฝึกใช้คำพูดที่ไพเราะกับทุกคนที่เราเจอนะครับ`
+                },
+                {
+                    day: "พุธ (สุขภาพ)",
+                    script: `สวัสดีครับนักเรียน
+เรามาดูแลสุขภาพด้วย “การกินผักผลไม้แทนขนม ของหวาน” กันเถอะครับ ขนมหวานอาจจะอร่อย แต่ถ้ากินมากไปจะไม่ดีต่อสุขภาพ ลองเปลี่ยนมากินผลไม้ที่มีรสหวานจากธรรมชาติและมีวิตามินมากมาย
+การเลือกกินของดีมีประโยชน์ จะทำให้ร่างกายเราแข็งแรง ไม่ป่วยง่ายครับ`
+                },
+                {
+                    day: "พฤหัสบดี (ความปลอดภัย)",
+                    script: `สวัสดีครับทุกคน
+วันนี้เป็นเรื่องความปลอดภัยที่สำคัญมาก คือ “การป้องกันอัคคีภัยและรู้จักทางหนีไฟ” ครับ เราต้องไม่เล่นสิ่งของที่ทำให้เกิดไฟได้ เช่น ไม้ขีดไฟ และควรสังเกตป้ายทางออกฉุกเฉินหรือทางหนีไฟในอาคารต่างๆ ไว้เสมอ
+การมีความรู้เรื่องนี้จะช่วยให้เราปลอดภัยเมื่อเกิดเหตุการณ์ไม่คาดฝันครับ`
+                },
+                {
+                    day: "ศุกร์ (แรงบันดาลใจ)",
+                    script: `สวัสดีเช้าวันศุกร์สุดท้ายของเดือนครับ
+ครูอยากจะบอกทุกคนว่า “ทุกความสำเร็จ เริ่มจากก้าวเล็กๆ” ไม่มีใครเก่งหรือทำอะไรสำเร็จได้ในวันเดียว ทุกอย่างมาจากการฝึกฝนและทำสิ่งเล็กๆ ซ้ำๆ อย่างสม่เสมอ เหมือนการต่อจิ๊กซอว์ทีละชิ้นจนเต็มภาพ
+ขอแค่เราไม่หยุดพยายาม สักวันความฝันของเราจะเป็นจริงแน่นอนครับ`
+                }
+            ]
+        };
+
+        const contentArea = document.getElementById('content-area');
+        const weekButtons = document.querySelectorAll('.week-btn');
+
+        function renderWeek(weekNumber) {
+            const weekKey = `week${weekNumber}`;
+            const weekData = scriptData[weekKey];
+            
+            contentArea.innerHTML = '';
+
+            const weekContainer = document.createElement('div');
+            weekContainer.className = 'week-content active';
+
+            if (weekData) {
+                weekData.forEach(dayData => {
+                    const card = document.createElement('div');
+                    card.className = 'day-card';
+                    
+                    const title = document.createElement('h2');
+                    title.textContent = dayData.day;
+                    
+                    const paragraph = document.createElement('p');
+                    paragraph.textContent = dayData.script;
+                    
+                    card.appendChild(title);
+                    card.appendChild(paragraph);
+                    weekContainer.appendChild(card);
+                });
+            }
+            
+            contentArea.appendChild(weekContainer);
+        }
+
+        function updateTime() {
+            const timeDisplay = document.getElementById('time-display');
+            if (!timeDisplay) return;
+            
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            
+            timeDisplay.textContent = `${hours}:${minutes}`;
+        }
+
+        weekButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                weekButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                const weekNumber = button.dataset.week;
+                renderWeek(weekNumber);
+            });
+        });
+
+        window.addEventListener('load', () => {
+            renderWeek(1);
+            updateTime();
+            setInterval(updateTime, 1000);
+        });
+
+    </script>
+</body>
+</html>
